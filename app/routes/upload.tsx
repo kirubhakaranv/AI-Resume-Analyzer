@@ -54,7 +54,7 @@ const Upload=()=>{
       :feedback?.message.content[0].text;
 
     data.feedback=JSON.parse(feedbackText);
-    await kv.set('`resume:${uuid}`',JSON.stringify(data));
+    await kv.set(`resume:${uuid}`,JSON.stringify(data));
     setStatusText("Analysis Complete Redirectring");
     console.log(data);
     navigate(`/resume/${uuid}`);

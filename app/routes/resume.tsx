@@ -3,6 +3,9 @@ import {Link} from 'react-router';
 import type { Route } from '../../.react-router/types/app/routes/+types/home';
 import { useEffect, useState } from 'react';
 import { usePuterStore } from '~/lib/puter';
+import Summary from "~/components/Summary";
+import ATS from "~/components/ATS";
+import Details from "~/components/Details";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Resumind" },
@@ -15,11 +18,11 @@ const Resume=()=>{
   const {id}=useParams();
   const [imageUrl, setImageUrl] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState<Feedback | null>();
   const navigate=useNavigate();
   useEffect(() => {
     if (!isLoading && !auth.isAuthenticated) navigate(`/auth?next=/resume${id}`);
-  }, [auth.isAuthenticated]);
+  }, [isLoading]);
   useEffect(()=>{
     const loadResume=async()=>{
       const resume=await kv.get(`resume:${id}`);
@@ -39,6 +42,8 @@ const Resume=()=>{
         const imageUrl = URL.createObjectURL(imageBlob);
         setImageUrl(imageUrl);
       }
+      console.log('data.feedback =', data.feedback);
+      console.log('typeof feedback =', typeof data.feedback);
       setFeedback(data.feedback);
       console.log({resumeUrl,imageBlob,feedback:data.feedback});
     }
@@ -66,7 +71,9 @@ const Resume=()=>{
           <h2 className={"text-4xl !text-black font-bold"}>Resume Review</h2>
           {feedback?(
             <div className={"flex flex-col gap-8 animate-in fade-in duraction-1000"}>
-              Summary ATS Details
+            <Summary feedback={feedback}/>
+              <ATS score={feedback.ATS.score||0} suggestions={feedback.ATS.tips|| []}/>
+              <Details feedback={feedback}/>
             </div>
           ):(
             <img src={"/images/resume-scan-2.gif"} className={"w-full"}/>
